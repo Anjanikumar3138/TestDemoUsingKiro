@@ -1,0 +1,43 @@
+{
+  "name": "user-registration-api-testing",
+  "version": "1.0.0",
+  "description": "Comprehensive API Testing Framework for a User Registration REST API",
+  "main": "dist/src/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/app.js",
+    "dev": "ts-node src/app.ts",
+    "test": "npx playwright test",
+    "test:positive": "npx playwright test tests/positive/",
+    "test:negative": "npx playwright test tests/negative/",
+    "test:properties": "npx playwright test tests/properties/",
+    "report": "npx playwright show-report",
+    "report:graph": "node playwright-report/generate-graph-report.js"
+  },
+  "keywords": [
+    "api-testing",
+    "playwright",
+    "express",
+    "typescript",
+    "property-based-testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "express-validator": "7.0.1",
+    "winston": "3.11.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "8.3.1",
+    "@playwright/test": "1.40.1",
+    "@types/cors": "2.8.17",
+    "@types/express": "4.17.21",
+    "@types/node": "20.10.4",
+    "allure-playwright": "2.10.0",
+    "fast-check": "3.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "5.3.3"
+  }
+}

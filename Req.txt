@@ -1,0 +1,792 @@
+Sure. This requirements document is asking you to build three things and document them properly:
+
+1. A User Registration REST API using Node.js + Express + TypeScript
+2. A Postman Collection for manual API testing
+3. A Playwright API Automation Framework for automated testing
+
+Here is a simplified explanation of each requirement.
+
+Project Goal
+
+Create a User Registration API and test it thoroughly using:
+
+* Manual testing (Postman)
+* Automated testing (Playwright)
+* Functional test scenarios
+* Test cases documentation
+* Reports
+
+---
+
+Requirement 1: Build the API
+
+What you need to create
+
+POST /api/users/register
+
+Register a user.
+
+Example Request:
+
+json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@test.com",
+  "phoneNumber": "9876543210",
+  "password": "Password123",
+  "confirmPassword": "Password123",
+  "dateOfBirth": "1995-01-01",
+  "age": 30,
+  "gender": "Male",
+  "nationality": "Indian",
+  "employeeId": "EMP001",
+  "isActive": true,
+  "address": {
+    "addressLine1": "Street 1",
+    "addressLine2": "Apartment 2",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "country": "India"
+  },
+  "skills": ["Java", "NodeJS"]
+}
+
+
+Success Response:
+
+json
+{
+  "id": 1,
+  
+}
+
+
+Status Code:
+
+text
+201 Created
+
+GET /api/users/{id}
+
+Get user details.
+
+Example:
+
+http
+GET /api/users/1
+
+
+Response:
+
+json
+{
+  "id": 1,
+  "firstName": "John"
+}
+
+
+Status:
+
+text
+200 OK
+
+
+DELETE /api/users/{id}
+
+Delete user.
+
+Example:
+
+http
+DELETE /api/users/1
+
+
+Response:
+
+json
+{
+  "message": "User deleted successfully"
+}
+
+
+Status:
+
+text
+200 OK
+
+
+Data Storage
+
+Use:
+
+javascript
+Map()
+
+or
+
+javascript
+Object
+
+or
+
+SQLite In-Memory
+
+
+No real database required.
+
+
+Requirement 2: Validation Rules
+
+The API must validate input data.
+
+firstName
+
+ Invalid
+
+json
+{
+  "firstName": ""
+}
+
+
+Response:
+
+text
+400 Bad Request
+
+
+Email Format
+
+Invalid
+
+json
+{
+  "email": "abc.com"
+}
+
+Response:
+
+text
+400 Bad Request
+
+
+Duplicate Email
+
+If same email already exists:
+
+```json
+{
+  "email": "john@test.com"
+}
+```
+
+Response:
+
+```text
+409 Conflict
+```
+
+---
+
+## Password Match
+
+❌ Invalid
+
+```json
+{
+  "password": "abc123",
+  "confirmPassword": "xyz123"
+}
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Phone Number
+
+Must be exactly 10 digits.
+
+✅ Valid
+
+```text
+9876543210
+```
+
+❌ Invalid
+
+```text
+98765
+abc1234567
+```
+
+---
+
+## Age
+
+Allowed:
+
+```text
+18 - 150
+```
+
+❌ Invalid
+
+```text
+17
+151
+```
+
+---
+
+## Address
+
+Must be present.
+
+❌ Invalid
+
+```json
+{
+  "address": null
+}
+```
+
+---
+
+## Invalid ID
+
+Example:
+
+```http
+GET /api/users/abc
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## User Not Found
+
+Example:
+
+```http
+GET /api/users/999
+```
+
+Response:
+
+```text
+404 Not Found
+```
+
+---
+
+# Requirement 3: Postman Collection
+
+Create a Postman collection containing:
+
+## Request 1
+
+Create User
+
+```http
+POST /api/users/register
+```
+
+---
+
+## Request 2
+
+Get User
+
+```http
+GET /api/users/{{userId}}
+```
+
+---
+
+## Request 3
+
+Delete User
+
+```http
+DELETE /api/users/{{userId}}
+```
+
+---
+
+## Environment Variables
+
+Create:
+
+```text
+baseUrl
+userId
+userEmail
+```
+
+---
+
+## Postman Test Scripts
+
+### Create User
+
+Validate:
+
+```javascript
+pm.response.code === 201
+```
+
+Check:
+
+* User ID exists
+* Response time < 2000 ms
+* Save userId
+
+Example:
+
+```javascript
+pm.environment.set("userId", pm.response.json().id);
+```
+
+---
+
+### Get User
+
+Validate:
+
+```javascript
+pm.response.code === 200
+```
+
+Check:
+
+* firstName
+* lastName
+* email
+* phoneNumber
+* address
+
+---
+
+### Delete User
+
+Validate:
+
+```javascript
+pm.response.code === 200
+```
+
+Check:
+
+```json
+{
+  "message": "User deleted successfully"
+}
+```
+
+---
+
+# Requirement 4: Functional Test Scenarios
+
+Document all possible scenarios.
+
+Examples:
+
+## Registration
+
+### Positive
+
+* Register user with all fields
+* Register user with mandatory fields only
+
+### Negative
+
+* Duplicate email
+* Invalid email
+* Password mismatch
+* Missing firstName
+* Missing lastName
+* Missing email
+* Invalid phone
+* Age below 18
+* Missing address
+
+---
+
+## Get User
+
+* Get existing user
+* Get deleted user
+* Get non-existing user
+* Invalid ID
+
+---
+
+## Delete User
+
+* Delete existing user
+* Delete already deleted user
+* Delete non-existing user
+* Invalid ID
+
+Minimum:
+
+```text
+17 scenarios
+```
+
+---
+
+# Requirement 5: Detailed Test Cases
+
+Create a test case document.
+
+Minimum:
+
+```text
+20 test cases
+```
+
+Distribution:
+
+```text
+POST   -> 9+
+GET    -> 4+
+DELETE -> 4+
+```
+
+---
+
+Example:
+
+| Test Case ID | Scenario                   |
+| ------------ | -------------------------- |
+| TC_REG_001   | Register user successfully |
+| TC_REG_002   | Invalid email              |
+| TC_GET_001   | Get existing user          |
+| TC_DEL_001   | Delete existing user       |
+
+---
+
+Each test case should contain:
+
+* Preconditions
+* Steps
+* Test Data
+* Expected Result
+* Actual Result
+* Status
+
+---
+
+# Requirement 6: Playwright Framework Structure
+
+Create a Playwright API Automation Framework.
+
+Folder Structure:
+
+```text
+project
+│
+├── tests
+├── fixtures
+├── models
+├── utils
+├── config
+├── logs
+├── playwright-report
+│
+├── playwright.config.ts
+├── package.json
+```
+
+---
+
+## models
+
+Create interfaces:
+
+```typescript
+interface User
+```
+
+```typescript
+interface Address
+```
+
+---
+
+## utils
+
+Create:
+
+### Config Reader
+
+Reads:
+
+```json
+{
+  "baseUrl": "http://localhost:3000"
+}
+```
+
+---
+
+### Test Data Generator
+
+Using Faker:
+
+```typescript
+faker.internet.email()
+```
+
+---
+
+### Assertion Helper
+
+Reusable validations:
+
+```typescript
+validateStatus()
+validateUser()
+```
+
+---
+
+## fixtures
+
+Create custom Playwright fixture:
+
+```typescript
+APIRequestContext
+```
+
+with:
+
+```text
+Content-Type: application/json
+```
+
+and logging.
+
+---
+
+# Requirement 7: Positive Automation Tests
+
+Automate happy path scenarios.
+
+Examples:
+
+## POST
+
+Create user successfully.
+
+Validate:
+
+* Status = 201
+* User ID generated
+* Response time < 2000ms
+* JSON response
+
+---
+
+## GET
+
+1. Create user
+2. Get user
+
+Validate:
+
+```text
+200 OK
+```
+
+Data matches.
+
+---
+
+## DELETE
+
+1. Create user
+2. Delete user
+
+Validate:
+
+```text
+200 OK
+```
+
+---
+
+# Requirement 8: Negative Automation Tests
+
+Automate error scenarios.
+
+Examples:
+
+### POST
+
+* Invalid email
+* Duplicate email
+* Empty firstName
+* Password mismatch
+* Missing required fields
+* Invalid phone
+* Age below 18
+
+---
+
+### GET
+
+* Invalid ID
+* User not found
+
+---
+
+### DELETE
+
+* Invalid ID
+* User not found
+
+---
+
+Validate:
+
+* Correct status code
+* Correct error message
+* JSON response
+
+---
+
+# Requirement 9: Reporting
+
+Generate reports.
+
+## Playwright Report
+
+Run:
+
+```bash
+npx playwright test
+```
+
+View:
+
+```bash
+npx playwright show-report
+```
+
+---
+
+## Allure (Optional)
+
+Generate:
+
+```text
+allure-results
+```
+
+View:
+
+```bash
+allure serve allure-results
+```
+
+---
+
+## Logging
+
+Use Winston.
+
+Log:
+
+* Request URL
+* Request Body
+* Response Status
+* Response Body
+
+Store logs:
+
+```text
+logs/
+```
+
+Example:
+
+```text
+api-test-2026-06-23.log
+```
+
+---
+
+# Requirement 10: Documentation
+
+Create a professional Markdown report.
+
+Sections required:
+
+1. Objective
+2. Scope
+3. Tools Used
+4. API Endpoints
+5. Test Approach
+6. Functional Test Scenarios
+7. Test Cases
+8. Automation Framework Design
+9. Execution Results
+10. Defects Found
+11. Conclusion
+
+---
+
+Also include:
+
+## Setup Steps
+
+### Start API
+
+```bash
+npm install
+npm run dev
+```
+
+### Run Tests
+
+```bash
+npx playwright test
+```
+
+---
+
+## Execution Summary Example
+
+| Total | Passed | Failed | Pass % |
+| ----- | ------ | ------ | ------ |
+| 25    | 24     | 1      | 96%    |
+
+---
+
+# Final Understanding
+
+In simple terms, this project has **6 deliverables**:
+
+| Deliverable | Description                                                          |
+| ----------- | -------------------------------------------------------------------- |
+| 1           | Build User Registration API (POST, GET, DELETE)                      |
+| 2           | Add all validation rules                                             |
+| 3           | Create Postman Collection                                            |
+| 4           | Create Functional Scenarios document                                 |
+| 5           | Create Detailed Test Cases document                                  |
+| 6           | Build Playwright API Automation Framework with reporting and logging |
+
+The end result should be a complete API testing project that demonstrates API development, manual testing, automation testing, reporting, and documentation in a professional QA portfolio format.

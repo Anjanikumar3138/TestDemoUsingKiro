@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K6 Load Test Report - User Registration API</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fefefe;
+      color: #100101;
+      padding: 30px;
+    }
+    .header {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header p { font-size: 14px; opacity: 0.9; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #f5fbf8;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid #2a3a5e;
+      transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+    .stat-card .label {
+      font-size: 13px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-card.success .value { color: #4caf50; }
+    .stat-card.warning .value { color: #ff9800; }
+    .stat-card.danger .value { color: #f44336; }
+    .chart-container {
+      background: White;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 30px;
+      border: 1px solid #2a3a5e;
+    }
+    .chart-container h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 768px) {
+      .chart-row { grid-template-columns: 1fr; }
+    }
+    .threshold-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .threshold-table th, .threshold-table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid #2d2e32;
+    }
+    .threshold-table th {
+      background: #9494f7;
+      color: #0d0e14;
+      font-weight: 1500;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+    .threshold-table td { font-size: 14px; }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.pass { background: #1b5e20; color: White; }
+    .badge.fail { background: #b71c1c; color: White; }
+    .config-section {
+      background: White;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #2a3a5e;
+      margin-bottom: 30px;
+    }
+    .config-section h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .config-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      background: #0f3460;
+      border-radius: 8px;
+    }
+    .config-item .key { color: White; }
+    .config-item .val { color: White; font-weight: 600; }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>K6 Load Test Results</h1>
+    <p>User Registration API | Date: 2026-06-24 | Time: 15:40:48 | Duration: 12 minutes</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="value">424,396</div>
+      <div class="label">Total Requests</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">588.34</div>
+      <div class="label">Requests/Second</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">500</div>
+      <div class="label">Max Virtual Users</div>
+    </div>
+    <div class="stat-card success">
+      <div class="value">0.00%</div>
+      <div class="label">Error Rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">277.87ms</div>
+      <div class="label">Avg Response Time</div>
+    </div>
+    <div class="stat-card success">
+      <div class="value">727ms</div>
+      <div class="label">P95 Response Time</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="chart-row">
+    <!-- Response Time Distribution (Bar Chart) -->
+    <div class="chart-container">
+      <h2>Response Time Percentiles</h2>
+      <canvas id="percentileChart"></canvas>
+    </div>
+
+    <!-- Response Time by Endpoint (Bar Chart) -->
+    <div class="chart-container">
+      <h2>Avg Response Time by Endpoint</h2>
+      <canvas id="endpointChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <!-- P95 by Endpoint (Horizontal Bar) -->
+    <div class="chart-container">
+      <h2>P95 Response Time by Endpoint</h2>
+      <canvas id="p95Chart"></canvas>
+    </div>
+
+    <!-- Threshold Gauge (Doughnut) -->
+    <div class="chart-container">
+      <h2>Error Rate vs Threshold (1%)</h2>
+      <canvas id="errorGauge"></canvas>
+    </div>
+  </div>
+
+  <!-- Max Response Time Comparison -->
+  <div class="chart-container">
+    <h2>Max Response Time by Endpoint (vs 2000ms Threshold)</h2>
+    <canvas id="maxChart"></canvas>
+  </div>
+
+  <!-- Threshold Results Table -->
+  <div class="chart-container">
+    <h2>Threshold Results</h2>
+    <table class="threshold-table">
+      <thead>
+        <tr>
+          <th>Threshold</th>
+          <th>Target</th>
+          <th>Actual</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Error Rate</td>
+          <td>&lt; 1%</td>
+          <td>0.00%</td>
+          <td><span class="badge pass">PASSED ✅</span></td>
+        </tr>
+        <tr>
+          <td>Response Time (P95)</td>
+          <td>&lt; 2000ms</td>
+          <td>727ms</td>
+          <td><span class="badge pass">PASSED ✅</span></td>
+        </tr>
+        <tr>
+          <td>Response Time (P99)</td>
+          <td>&lt; 2000ms</td>
+          <td>N/A</td>
+          <td><span class="badge fail">FAILED ❌</span></td>
+        </tr>
+        <tr>
+          <td>Create User (P95)</td>
+          <td>&lt; 2000ms</td>
+          <td>764.77ms</td>
+          <td><span class="badge pass">PASSED ✅</span></td>
+        </tr>
+        <tr>
+          <td>Get User (P95)</td>
+          <td>&lt; 2000ms</td>
+          <td>791.62ms</td>
+          <td><span class="badge pass">PASSED ✅</span></td>
+        </tr>
+        <tr>
+          <td>Delete User (P95)</td>
+          <td>&lt; 2000ms</td>
+          <td>703.97ms</td>
+          <td><span class="badge pass">PASSED ✅</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Test Configuration -->
+  <div class="config-section">
+    <h2>Test Configuration</h2>
+    <div class="config-grid">
+      <div class="config-item">
+        <span class="key">Target URL</span>
+        <span class="val">http://localhost:3000</span>
+      </div>
+      <div class="config-item">
+        <span class="key">Scenario</span>
+        <span class="val">Register → Get → Delete → Verify</span>
+      </div>
+      <div class="config-item">
+        <span class="key">Ramp-Up</span>
+        <span class="val">0 → 500 users / 1 min</span>
+      </div>
+      <div class="config-item">
+        <span class="key">Steady State</span>
+        <span class="val">500 users / 10 min</span>
+      </div>
+      <div class="config-item">
+        <span class="key">Ramp-Down</span>
+        <span class="val">500 → 0 users / 1 min</span>
+      </div>
+      <div class="config-item">
+        <span class="key">Total Iterations</span>
+        <span class="val">106,099</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated from K6 Load Test | User Registration API Testing Project
+  </div>
+
+  <script>
+    // Chart.js default styling for dark theme
+    Chart.defaults.color = '#aaa';
+    Chart.defaults.borderColor = '#2a3a5e';
+
+    // 1. Response Time Percentiles
+    new Chart(document.getElementById('percentileChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Median (P50)', 'P90', 'P95', 'Max'],
+        datasets: [{
+          label: 'Response Time (ms)',
+          data: [239.91, 602.68, 727.02, 1987.52],
+          backgroundColor: ['#4caf50', '#ff9800', '#ff5722', '#f44336'],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              threshold: {
+                type: 'line', yMin: 2000, yMax: 2000,
+                borderColor: '#f44336', borderDash: [5, 5], borderWidth: 2,
+                label: { content: 'Threshold: 2000ms', enabled: true }
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Time (ms)' },
+            grid: { color: '#2a3a5e' }
+          },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // 2. Avg Response Time by Endpoint
+    new Chart(document.getElementById('endpointChart'), {
+      type: 'bar',
+      data: {
+        labels: ['POST /register', 'GET /users/:id', 'DELETE /users/:id'],
+        datasets: [{
+          label: 'Avg Response Time (ms)',
+          data: [280.02, 314.11, 270.59],
+          backgroundColor: ['#667eea', '#764ba2', '#f093fb'],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Time (ms)' },
+            grid: { color: '#2a3a5e' }
+          },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // 3. P95 by Endpoint (horizontal bar)
+    new Chart(document.getElementById('p95Chart'), {
+      type: 'bar',
+      data: {
+        labels: ['POST /register', 'GET /users/:id', 'DELETE /users/:id'],
+        datasets: [
+          {
+            label: 'P95 (ms)',
+            data: [764.77, 791.62, 703.97],
+            backgroundColor: ['#667eea', '#764ba2', '#f093fb'],
+            borderRadius: 6,
+          },
+          {
+            label: 'Threshold (2000ms)',
+            data: [2000, 2000, 2000],
+            backgroundColor: 'rgba(244, 67, 54, 0.2)',
+            borderColor: '#f44336',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            borderRadius: 6,
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: { display: true, text: 'Time (ms)' },
+            grid: { color: '#2a3a5e' }
+          },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+
+    // 4. Error Rate Gauge (Doughnut)
+    new Chart(document.getElementById('errorGauge'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Success', 'Threshold Remaining'],
+        datasets: [{
+          data: [100, 0],
+          backgroundColor: ['#4caf50', '#2a3a5e'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '70%',
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.label === 'Success'
+                ? 'Error Rate: 0.00% (Target: < 1%)'
+                : 'Remaining budget: 1.00%'
+            }
+          }
+        }
+      }
+    });
+
+    // 5. Max Response Time Comparison
+    new Chart(document.getElementById('maxChart'), {
+      type: 'bar',
+      data: {
+        labels: ['POST /register', 'GET /users/:id', 'DELETE /users/:id', 'Threshold'],
+        datasets: [{
+          label: 'Max Response Time (ms)',
+          data: [1987.52, 1985.69, 1848.91, 2000],
+          backgroundColor: ['#667eea', '#764ba2', '#f093fb', 'rgba(244, 67, 54, 0.3)'],
+          borderColor: ['#667eea', '#764ba2', '#f093fb', '#f44336'],
+          borderWidth: [0, 0, 0, 2],
+          borderDash: [[0], [0], [0], [5, 5]],
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Time (ms)' },
+            grid: { color: '#2a3a5e' }
+          },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

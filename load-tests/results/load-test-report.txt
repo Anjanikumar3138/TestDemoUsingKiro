@@ -1,0 +1,77 @@
+
+╔════════════════════════════════════════════════════════════════════╗
+║           K6 LOAD TEST RESULTS REPORT                             ║
+║           User Registration API                                   ║
+╠════════════════════════════════════════════════════════════════════╣
+║  Date       : 2026-06-26                                          
+║  Time       : 11:34:21                 
+║  Duration   : 12 minutes (1m ramp-up + 10m hold + 1m ramp-down)  
+║  Target VUs : 500 concurrent users                                
+╚════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 1. OVERALL SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Total Requests Made       : 602736
+  Requests Per Second       : 835.36
+  Total Iterations          : 150684
+  Max Virtual Users         : 500
+  Error Rate                : 0.00%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 2. RESPONSE TIME METRICS (All Requests)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Average                   : 47.57 ms
+  Minimum                   : N/A ms
+  Maximum                   : 1498.40 ms
+  Median (P50)              : 3.75 ms
+  P90                       : 140.90 ms
+  P95                       : 214.57 ms
+  P99                       : N/A ms
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 3. RESPONSE TIME BY ENDPOINT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  POST /api/users/register (Create User)
+    Average                 : 43.07 ms
+    P95                     : 201.75 ms
+    Max                     : 1498.40 ms
+
+  GET /api/users/:id (Get User)
+    Average                 : 58.22 ms
+    P95                     : 248.14 ms
+    Max                     : 1495.82 ms
+
+  DELETE /api/users/:id (Delete User)
+    Average                 : 47.25 ms
+    P95                     : 213.90 ms
+    Max                     : 1483.09 ms
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 4. THRESHOLD RESULTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ┌─────────────────────────────────┬──────────────┬──────────┐
+  │ Threshold                       │ Actual       │ Result   │
+  ├─────────────────────────────────┼──────────────┼──────────┤
+  │ Error Rate < 1%                 │ 0.00        │ PASSED ✅ │
+  │ Response Time P95 < 2000ms      │ 215ms       │ PASSED ✅ │
+  │ Response Time P99 < 2000ms      │ N/A         │ FAILED ❌ │
+  └─────────────────────────────────┴──────────────┴──────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 5. TEST CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Target URL                : http://localhost:3000
+  Ramp-Up                   : 0 → 500 users over 1 minute
+  Steady State              : 500 users for 10 minutes
+  Ramp-Down                 : 500 → 0 users over 1 minute
+  Scenario                  : Full lifecycle (Register → Get → Delete → Verify)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ OVERALL RESULT: ALL THRESHOLDS PASSED ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

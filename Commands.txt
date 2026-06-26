@@ -1,0 +1,114 @@
+============================================================
+  API TESTING COMMANDS - User Registration API
+============================================================
+
+------------------------------------------------------------
+1. START THE API SERVER (Required First)
+------------------------------------------------------------
+
+# Build the TypeScript project
+npm run build
+
+# Start the API server
+npm run start
+
+# Or run directly with ts-node (dev mode)
+npm run dev
+
+The API will be running at http://localhost:3000
+
+------------------------------------------------------------
+2. PLAYWRIGHT TEST COMMANDS
+------------------------------------------------------------
+
+# Run ALL tests (positive + negative + property-based)
+npx playwright test
+
+# Run only positive tests
+npx playwright test tests/positive/
+
+# Run only negative tests
+npx playwright test tests/negative/
+
+# Run only property-based tests
+npx playwright test tests/properties/
+
+# Run a specific test file
+npx playwright test tests/positive/registration-positive.spec.ts
+
+# View the HTML report after tests complete
+npx playwright show-report
+
+# View Allure report (optional, if allure is set up)
+allure serve allure-results
+
+------------------------------------------------------------
+3. POSTMAN COMMANDS
+------------------------------------------------------------
+
+Option 1: Import into Postman GUI
+----------------------------------
+1. Open Postman
+2. Click Import -> select postman/user-registration-api.postman_collection.json
+3. Import the environment: postman/user-registration-api.postman_environment.json
+4. Select the environment in the top-right dropdown
+5. Run requests individually or use the Collection Runner (Create -> Get -> Delete order)
+
+Option 2: Run via Newman (Postman CLI)
+---------------------------------------
+
+# Install Newman globally
+npm install -g newman
+
+# Run the collection with the environment
+newman run postman/user-registration-api.postman_collection.json -e postman/user-registration-api.postman_environment.json
+
+# Run with HTML report
+newman run postman/user-registration-api.postman_collection.json -e postman/user-registration-api.postman_environment.json -r htmlextra
+
+------------------------------------------------------------
+4. QUICK REFERENCE TABLE
+------------------------------------------------------------
+
+What                        | Command
+----------------------------|----------------------------------------------------------
+Build project               | npm run build
+Start API                   | npm run start
+Run all Playwright tests    | npx playwright test
+Run positive tests only     | npx playwright test tests/positive/
+Run negative tests only     | npx playwright test tests/negative/
+Run property tests only     | npx playwright test tests/properties/
+View Playwright report      | npx playwright show-report
+Run Postman via CLI         | newman run postman/user-registration-api.postman_collection.json -e postman/user-registration-api.postman_environment.json
+
+------------------------------------------------------------
+NOTE
+------------------------------------------------------------
+Make sure the API server is running before executing any tests.
+Both Playwright and Postman/Newman need it active on port 3000.
+
+
+------------------------------------------------------------
+5. K6 LOAD TESTING COMMANDS
+------------------------------------------------------------
+
+Prerequisites:
+- Install k6: https://grafana.com/docs/k6/latest/set-up/install-k6/
+  - Windows (choco): choco install k6
+  - Windows (winget): winget install k6 --source winget
+  - macOS: brew install k6
+
+# Make sure API server is running first
+npm run start
+
+# Run load test (500 users, 10 minutes)
+k6 run load-tests/k6-load-test.js
+
+# Run with custom base URL
+k6 run -e BASE_URL=http://localhost:3000 load-tests/k6-load-test.js
+
+# Run with JSON output
+k6 run --out json=load-tests/results/output.json load-tests/k6-load-test.js
+
+# Run with fewer users for a quick smoke test
+k6 run --vus 10 --duration 30s load-tests/k6-load-test.js
